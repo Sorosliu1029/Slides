@@ -12,7 +12,8 @@ io = io(server);
 
 var opts = {
 	port :      1947,
-	baseDir :   __dirname + '/../../'
+	baseDir :   __dirname + '/../../',
+	slideDir:   __dirname + '/../../slides/billiards'
 };
 
 io.on( 'connection', function( socket ) {
@@ -40,7 +41,7 @@ io.on( 'connection', function( socket ) {
 app.get('/', function( req, res ) {
 
 	res.writeHead( 200, { 'Content-Type': 'text/html' } );
-	fs.createReadStream( opts.baseDir + '/index.html' ).pipe( res );
+	fs.createReadStream( opts.slideDir + '/index.html' ).pipe( res );
 
 });
 

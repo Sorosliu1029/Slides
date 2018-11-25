@@ -41,7 +41,15 @@
       // More info about config & dependencies:
       // - https://github.com/hakimel/reveal.js#configuration
       // - https://github.com/hakimel/reveal.js#dependencies
+
+      const IS_MASTER = false
       Reveal.initialize({
+        multiplex: {
+          // Example values. To generate your own, see the socket.io server instructions.
+          secret: IS_MASTER ? '15431396268625390990' : null, // Obtained from the socket.io server. Gives this (the master) control of the presentation
+          id: '8afb5cc787d3f188', // Obtained from socket.io server
+          url: 'https://reveal-js-multiplex-ccjbegmaii.now.sh', // Location of socket.io server
+        },
         dependencies: [
           { src: '../../plugin/markdown/marked.js' },
           { src: '../../plugin/markdown/markdown.js' },
@@ -53,6 +61,14 @@
               hljs.initHighlightingOnLoad()
             },
           },
+          { src: 'https://cdn.socket.io/socket.io-1.3.5.js', async: true },
+
+          IS_MASTER
+            ? { src: '../../plugin/multiplex/master.js', async: true }
+            : { src: '../../plugin/multiplex/client.js', async: true },
+
+          // and if you want speaker notes
+          // { src: '../../plugin/notes-server/client.js', async: true },
         ],
       })
     </script>
