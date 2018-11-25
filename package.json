@@ -1,13 +1,14 @@
 {
-  "name": "reveal.js",
-  "version": "3.7.0",
-  "description": "The HTML Presentation Framework",
+  "name": "slides",
+  "version": "1.0.0",
+  "description": "Slides of Sorosliu1029, powered by revealjs, a HTML presentation ramework",
   "homepage": "http://revealjs.com",
   "subdomain": "revealjs",
   "main": "js/reveal.js",
   "scripts": {
     "test": "grunt test",
-    "start": "grunt serve",
+    "start": "grunt connect",
+    "start:dev": "grunt dev-serve",
     "build": "grunt"
   },
   "author": {
@@ -20,9 +21,9 @@
     "url": "git://github.com/hakimel/reveal.js.git"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
-  "devDependencies": {
+  "dependencies": {
     "express": "^4.16.2",
     "grunt": "^1.0.1",
     "grunt-autoprefixer": "^3.0.4",
@@ -30,7 +31,6 @@
     "grunt-contrib-connect": "^1.0.2",
     "grunt-contrib-cssmin": "^2.2.1",
     "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-qunit": "^2.0.0",
     "grunt-contrib-uglify": "^3.3.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^2.0.0",

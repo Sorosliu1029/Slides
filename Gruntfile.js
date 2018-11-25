@@ -1,6 +1,6 @@
 /* global module:false */
 module.exports = function(grunt) {
-	var port = grunt.option('port') || 8000;
+	var port = grunt.option('port') || 3000;
 	var root = grunt.option('root') || '.';
 
 	if (!Array.isArray(root)) root = [root];
@@ -17,10 +17,6 @@ module.exports = function(grunt) {
 				' *\n' +
 				' * Copyright (C) 2018 Hakim El Hattab, http://hakim.se\n' +
 				' */'
-		},
-
-		qunit: {
-			files: [ 'test/*.html' ]
 		},
 
 		uglify: {
@@ -94,11 +90,10 @@ module.exports = function(grunt) {
 		connect: {
 			server: {
 				options: {
+					hostname: '0.0.0.0',
 					port: port,
 					base: root,
-					livereload: true,
-					open: true,
-					useAvailablePort: true
+					keepalive: true,
 				}
 			}
 		},
@@ -158,7 +153,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks( 'grunt-contrib-connect' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-jshint' );
-	grunt.loadNpmTasks( 'grunt-contrib-qunit' );
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
@@ -185,7 +179,7 @@ module.exports = function(grunt) {
 	grunt.registerTask( 'package', [ 'default', 'zip' ] );
 
 	// Serve presentation locally
-	grunt.registerTask( 'serve', [ 'connect', 'watch' ] );
+	grunt.registerTask( 'dev-serve', [ 'connect', 'watch' ] );
 
 	// Run tests
 	grunt.registerTask( 'test', [ 'jshint', 'qunit' ] );
