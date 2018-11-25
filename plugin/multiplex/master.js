@@ -8,7 +8,6 @@
 	var socket = io.connect( multiplex.url );
 
 	function post() {
-
 		var messageData = {
 			state: Reveal.getState(),
 			secret: multiplex.secret,
