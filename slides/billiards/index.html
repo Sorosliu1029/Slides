@@ -6,11 +6,27 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
+    <meta
+      name="description"
+      content="即刻-即课 2018-11-26 「如何赚xxd的红包 - 🎱 篇"
+    />
+    <meta name="author" content="搞即建的" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link
+      rel="icon"
+      href="../../resources/images/billiards.png"
+      type="image/vnd.microsoft.icon"
+    />
 
     <title>如何赚xxd的红包 - 台球篇</title>
 
     <link rel="stylesheet" href="../../css/reveal.css" />
-    <link rel="stylesheet" href="../../css/theme/black.css" />
+    <link rel="stylesheet" href="../../css/theme/black.css" id="theme" />
 
     <!-- Theme used for syntax highlighting of code -->
     <link rel="stylesheet" href="../../lib/css/zenburn.css" />
@@ -29,13 +45,213 @@
   <body>
     <div class="reveal">
       <div class="slides">
-        <section>Slide 1</section>
-        <section>Slide 2</section>
+        <!-- 首页 -->
+        <section data-background="../../resources/images/first-background.png">
+          <h2 style="color: black">如何赚xxd的红包 - 🎱 篇</h2>
+          <p style="color: black; font-size: 2rem">即课 2018-11-26 期</p>
+          <p style="color: black; font-size: 2rem">By 搞即建的</p>
+          <br />
+          <a href="#" id="qrcode">
+            <img
+              data-src="../../resources/images/billiards-qrcode.png"
+              alt="qrcode"
+            />
+          </a>
+          <aside class="notes"></aside>
+        </section>
+
+        <!-- 规则 -->
+        <section style="text-align: left;">
+          <h4>🎱 八球规则</h4>
+          <p class="fragment fade-right">
+            - 摆球：黑八在中间，全色、半色各占一角
+          </p>
+          <p class="fragment fade-right">
+            - 选球：除开球外，己方打进的第一个球对应花色
+          </p>
+          <p class="fragment fade-right">
+            - 出杆：己方球未进袋或犯规（自由球），则交替
+          </p>
+          <p class="fragment fade-right">
+            - 犯规：未先击己方球/母球落袋/未碰库(cushion)/...
+          </p>
+          <p class="fragment fade-right">
+            - 赢球：己方按序打完所有球 / 对方打完自己的球之前先进黑八 /
+            对方击打黑八时母球落袋
+          </p>
+          <aside class="notes">其他犯规： 任意球跳出台面，双脚离地</aside>
+        </section>
+
+        <!-- 切入页 - 标准台球游戏截图 -->
+        <section data-background="../../resources/images/show.gif">
+          <aside class="notes">
+            动量守恒 <br />
+            以游戏模型看打台球的关键要素：1. 人 2. 球 3. 杆
+          </aside>
+        </section>
+
+        <!-- 分要素点 -->
+        <!-- 人 -->
+        <section>
+          <section style="text-align: left;">
+            <h3>人</h3>
+            <p class="fragment fade-right">- 站姿：</p>
+            <ul class="fragment fade-right">
+              <li>双膝微曲，重心在中间</li>
+              <li>前后站立，比肩稍宽，前脚指向击球方向</li>
+              <li>俯身贴杆，视线沿球杆所在直线</li>
+            </ul>
+            <p class="fragment fade-right">- 握杆：</p>
+            <ul class="fragment fade-right">
+              <li>握杆位置：小臂与杆呈90°</li>
+              <li>手腕自然放松，不内外翻</li>
+              <li>大臂不动</li>
+              <li>虎口紧握，后拉放松</li>
+            </ul>
+          </section>
+          <section style="text-align: left;">
+            <h3>人</h3>
+            <p class="fragment fade-right">- 手架：</p>
+            <ul class="fragment fade-right">
+              <li>没有特定的手架姿势，舒服稳定即可</li>
+              <li>V型手架，架杆手小臂微曲，肘部贴住台面</li>
+              <li>非贴库球手架：依托于手</li>
+              <li>贴库球手架：依托于库边</li>
+              <li>高、中、低杆手架的区别</li>
+            </ul>
+          </section>
+          <section style="text-align: left;">
+            <h3>人</h3>
+            <p class="fragment fade-right">- 开球：</p>
+            <ul class="fragment fade-right">
+              <li>开球目标：尽可能使球形散开</li>
+              <li>开球手架：双指贴库</li>
+              <li>开球站姿：胯部往后坐，开球时身体顺势向前抬</li>
+            </ul>
+            <p class="fragment fade-right">- 架杆：</p>
+            <ul class="fragment fade-right">
+              <li>使用场景：远距离击球，手架不舒服</li>
+              <li>不要抬着架杆，把架杆固定好</li>
+              <li>握杆手手型：以出杆稳为目标</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- 杆 -->
+        <section>
+          <section style="text-align: left;">
+            <h3>杆</h3>
+            <p class="fragment fade-right">- 出杆直：</p>
+            <ul class="fragment fade-right">
+              <li>第一要义：基础姿势练习好</li>
+              <li>几个辅助练习：瓶口练习 / 直线球练习</li>
+              <li>能不发力就不发力</li>
+            </ul>
+            <aside class="notes">
+              打的点不是我瞄的点 <br />
+              发力容易导致出杆歪了
+            </aside>
+          </section>
+          <section style="text-align: left;">
+            <h3>杆</h3>
+            <p class="fragment fade-right">- 力度控制：</p>
+            <ul class="fragment fade-right">
+              <li>手套的弊端：难以感受出杆力度</li>
+              <li>八球因为台面摩擦和球桌大小，不需要很多发力</li>
+              <li>
+                发力容易引发的问题：晃袋 / 击球点偏移 / 次杆 / 误打进其他球
+              </li>
+              <li>对于力度的掌控主要靠练习</li>
+            </ul>
+            <aside class="notes">手套的必要性：出汗比较多，手上摩擦大</aside>
+          </section>
+
+          <section style="text-align: left;">
+            <h3>杆</h3>
+            <p class="fragment fade-right">- 角度控制：</p>
+            <ul class="fragment fade-right">
+              <li>
+                90°法则：速度矢量分解。传递给目标球一部分速度，母球带有另一部分速度
+              </li>
+              <li>目标球的运动路线只取决于母球与目标球的碰撞点，与杆法无关</li>
+              <li>打厚了 / 打薄了</li>
+            </ul>
+            <aside class="notes">
+              薄厚取决于母球路线与目标球中心点间的关系，离得近称为「厚」，离得远称为「薄」
+            </aside>
+          </section>
+        </section>
+
+        <!-- 球 -->
+        <section>
+          <section style="text-align: left;">
+            <h3>球（母球走位）</h3>
+            <p class="fragment fade-right">- 高低杆：</p>
+            <ul class="fragment fade-right">
+              <li>
+                高杆：击球点位于球中心点上方 <br />
+                - 跟秆：母球沿击球线路继续前进
+              </li>
+              <br />
+              <li>
+                低杆：击球点位于球中心点下方 <br />
+                - 定杆：母球留在目标球位置，击球点位于中下方 <br />
+                - 缩杆：母球撞击后方向与击球方向相反，击球点位于最下方（拉回来）
+              </li>
+              <li>⚠️ 低杆容易跳球</li>
+            </ul>
+          </section>
+          <section style="text-align: left;">
+            <h3>球（母球走位）</h3>
+            <p class="fragment fade-right">- 水平加塞(slide)：</p>
+            <ul class="fragment fade-right">
+              <li>
+                加左塞：击球点位于球中心点左侧 <br />
+                - 效果：母球撞击后的路线会比直线球更靠左
+              </li>
+              <br />
+              <li>
+                加右塞：击球点位于球中心点右侧 <br />
+                - 效果：母球撞击后的路线会比直线球更靠右
+              </li>
+              <br />
+              <li>⚠️ 加塞容易次杆，打好巧粉加大摩擦(chalk)</li>
+            </ul>
+          </section>
+          <section style="text-align: left;">
+            <h3>球（母球走位）</h3>
+            <p class="fragment fade-right">- 高低位加塞与水平加塞组合：</p>
+            <ul class="fragment fade-right">
+              <li>原理：角速度</li>
+              <li>高位加塞：角速度助推母球前进</li>
+              <li>低位加塞：角速度阻碍母球前进</li>
+              <li>左右加塞：在碰撞瞬间角速度作用于母球</li>
+              <br />
+              <li>高杆+水平加塞：减少水平加塞的效果</li>
+              <li>低杆+水平加塞：增强水平加塞的效果</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- 其他小技巧 -->
+        <section style="text-align: left;">
+          <h3>其他小技巧</h3>
+          <ul>
+            <li>定位击球点：用球杆辅助瞄准</li>
+            <li>翻袋球：直线比较有把握</li>
+            <li>防守球：对方没有直接击球点 / 远台球 / 贴库球</li>
+            <li>解球：弹库 / 加塞（很难） / 跳球（不推荐）</li>
+          </ul>
+          <aside class="notes"></aside>
+        </section>
+        <!-- Ending -->
+        <section>End.</section>
       </div>
     </div>
 
     <script src="../../lib/js/head.min.js"></script>
     <script src="../../js/reveal.js"></script>
+    <script src="../../custom/js/full-screen.js"></script>
 
     <script>
       // More info about config & dependencies:
@@ -44,6 +260,13 @@
 
       const IS_MASTER = false
       Reveal.initialize({
+        controls: true,
+        progress: false,
+        history: true,
+        hideAddressBar: true,
+        slideNumber: 'h/v',
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
         multiplex: {
           // Example values. To generate your own, see the socket.io server instructions.
           secret: IS_MASTER ? '15431396268625390990' : null, // Obtained from the socket.io server. Gives this (the master) control of the presentation
@@ -71,6 +294,8 @@
           // { src: '../../plugin/notes-server/client.js', async: true },
         ],
       })
+
+      document.getElementById('qrcode').onclick = toggleFullScreen
     </script>
   </body>
 </html>
