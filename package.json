@@ -2,8 +2,7 @@
   "name": "slides",
   "version": "1.0.0",
   "description": "Slides of Sorosliu1029, powered by revealjs, a HTML presentation ramework",
-  "homepage": "http://revealjs.com",
-  "subdomain": "revealjs",
+  "homepage": "https://github.com/Sorosliu1029/Slides",
   "main": "js/reveal.js",
   "scripts": {
     "test": "grunt test",
