@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="YOUR SLIDE DESCRIPTION" />
+    <meta name="author" content="Soros Liu" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>Redis 持久化</title>
+
+    <link rel="stylesheet" href="../../css/reveal.min.css" />
+    <link rel="stylesheet" href="../../css/theme/black.css" id="theme" />
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="../../lib/css/zenburn.css" />
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.type = 'text/css'
+      link.href = window.location.search.match(/print-pdf/gi)
+        ? '../../css/print/pdf.css'
+        : '../../css/print/paper.css'
+      document.getElementsByTagName('head')[0].appendChild(link)
+    </script>
+  </head>
+
+  <body>
+    <div class="reveal">
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section>
+          <h1>Redis 持久化</h1>
+          <br />
+          <ul>
+            <li><code>SAVE / BGSAVE</code> - RDB持久化</li>
+            
+            <li><code>BGREWRITEAOF</code> - AOF持久化</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>RDB持久化</h2>
+            <ul>
+              <li>保存所有键值对数据</li>
+              <li><code>SAVE</code> 阻塞服务器主进程，禁止使用</li>
+              <li><code>BGSAVE</code> fork出子进程</li>
+            </ul>
+          </section>
+          <section>
+            <h2>自动保存</h2>
+            <span>自动保存配置项: </span><code>save 60 1000</code>
+            <pre>
+              <code class="hljs" data-trim>
+                struct redisServer {
+                  // ...
+                  // 记录自动保存条件的数组 { changes: 1000, seconds: 60 }
+                  struct saveparam *saveparams;
+                  // 修改计数器
+                  long long dirty;
+                  // 上一次执行保存的时间
+                  time_t lastsave;
+                }
+              </code>
+            </pre>
+          </section>
+          <section>
+            服务器进程执行周期性函数
+            <pre>
+                <code class="hljs" data-trim>
+                  def serverCron():
+                    # ...
+                    for saveparam in server.saveparams:
+                      # 上次保存后过了多久
+                      save_interval = unixtime_now() - server.lastsave
+                      if server.dirty >= saveparam.changes and \
+                        save_interval > saveparam.seconds:
+                        BGSAVE()
+                    # ...
+                </code>
+              </pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>AOF持久化</h2>
+            <ul>
+              <li>保存所有写命令</li>
+              <li>先保存到AOF缓冲区，定期写入并同步到AOF文件</li>
+              <li><code>appendfsync</code>配置项对性能有影响</li>
+              <li><code>AOF rewrite</code>能产生一致的AOF文件，但文件体积更小</li>
+            </ul>
+          </section>
+          <section>
+            <table style="font-size: 90%">
+              <caption>不同的<code>appendfsync</code>值产生不同的持久化行为</caption>
+                <tr>
+                  <th>appendfsync项的值</th>
+                  <th>flushAppendOnlyFile函数的行为</th>
+                </tr>
+                <tr>
+                  <td>always</td>
+                  <td>将aof_buf缓冲区中的所有内容写入并同步到AOF文件</td>
+                </tr>
+                <tr>
+                  <td>everysec</td>
+                  <td>将aof_buf缓冲区中的所有内容写入到AOF文件。如果上次同步AOF文件的时间距离现在超过一秒钟，则再次对AOF文件进行同步</td>
+                </tr>
+                <tr>
+                  <td>no</td>
+                  <td>将aof_buf缓冲区中的所有内容写入并同步到AOF文件，但不对AOF文件进行同步，何时同步由操作系统决定</td>
+                </tr>
+            </table>
+          </section>
+          <section>
+            按时序记录写命令到AOF文件的问题：数据冗余，AOF文件体积过大
+            <pre>
+                <code class="hljs" data-trim>
+                  redis > RPUSH list "A" "B"
+                  redis > RPUSH list "C"
+                  redis > RPUSH list "D" "E"
+                  redis > LPOP list
+                  redis > LPOP list
+                  redis > RPUSH list "F"
+                </code>
+              </pre>
+            <ul>
+              <li>不必要的空间浪费</li>
+              <li>用AOF文件恢复数据时，耗时过长</li>
+            </ul>
+          </section>
+          <section>
+            AOF rewrite: 读取当前Redis数据库的状态，用单一写命令来替代多条写命令
+            <pre>
+                <code class="hljs" data-trim>
+                  def rewrite_string(key):
+                    # 使用 GET 命令获取字符串键的值
+                    value = GET(key)
+                    # 使用 SET 命令重写字符串键
+                    f.write_command(SET, key, value)
+                </code>
+              </pre>
+          </section>
+        </section>
+        <section>
+          <a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/BestPractices.BGSAVE.html">AWS BGSAVE best practice</a>
+        </section>
+      </div>
+    </div>
+
+    <script src="../../lib/js/head.min.js"></script>
+    <script src="../../js/reveal.min.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        hideAddressBar: true,
+        slideNumber: 'h/v',
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          {
+            src: '../../lib/js/classList.js',
+            condition: function() {
+              return !document.body.classList
+            },
+          },
+          {
+            src: '../../plugin/markdown/marked.js',
+            condition: function() {
+              return !!document.querySelector('[data-markdown]')
+            },
+          },
+          {
+            src: '../../plugin/markdown/markdown.js',
+            condition: function() {
+              return !!document.querySelector('[data-markdown]')
+            },
+          },
+          {
+            src: '../../plugin/highlight/highlight.js',
+            async: true,
+            callback: function() {
+              hljs.initHighlightingOnLoad()
+            },
+          },
+          { src: '../../plugin/search/search.js', async: true },
+          { src: '../../plugin/zoom-js/zoom.js', async: true },
+          { src: '../../plugin/notes/notes.js', async: true },
+        ],
+      })
+    </script>
+  </body>
+</html>

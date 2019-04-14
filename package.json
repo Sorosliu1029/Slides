@@ -9,7 +9,8 @@
     "start": "grunt connect",
     "dev": "grunt dev-serve",
     "notes": "node plugin/notes-server",
-    "build": "grunt"
+    "build": "grunt",
+    "newSlide": "cp -R ./slides/template"
   },
   "author": {
     "name": "Soros Liu",
