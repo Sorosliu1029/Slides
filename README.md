@@ -1,3 +1,3 @@
 # Slides
 
-See 👉 https://www.0x2beace.me/Slides/
+See 👉 https://slides.sorosliu.xyz/
