@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Slides by Soros Liu" />
+    <meta name="author" content="Soros Liu" />
+    <title>Slides · Soros Liu</title>
+    <style>
+      :root {
+        --bg: #fafafa;
+        --card: #ffffff;
+        --text: #1f2328;
+        --muted: #6e7781;
+        --border: #e4e7eb;
+        --accent: #0969da;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --card: #161b22;
+          --text: #e6edf3;
+          --muted: #8b949e;
+          --border: #30363d;
+          --accent: #58a6ff;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 72px 16px 48px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2rem;
+        letter-spacing: -0.02em;
+      }
+      header p {
+        margin: 4px 0 40px;
+        color: var(--muted);
+      }
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+      a.slide {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 20px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: inherit;
+        text-decoration: none;
+        transition: border-color 0.15s, transform 0.15s;
+      }
+      a.slide:hover,
+      a.slide:focus-visible {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        outline: none;
+      }
+      .info {
+        flex: 1;
+        min-width: 0;
+      }
+      .title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .summary {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      time {
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .arrow {
+        color: var(--accent);
+        font-size: 1.2rem;
+      }
+      footer {
+        margin-top: 48px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Slides</h1>
+        <p>Talks by Soros Liu</p>
+      </header>
+
+      <ul>
+        <li>
+          <a class="slide" href="./redis-persistence/">
+            <div class="info">
+              <p class="title">Redis 持久化</p>
+              <p class="summary">RDB 与 AOF 持久化原理</p>
+            </div>
+            <time datetime="2019-04-14">2019-04-14</time>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+        <li>
+          <a class="slide" href="./billiards/">
+            <div class="info">
+              <p class="title">如何赚xxd的红包 - 台球篇</p>
+              <p class="summary">即刻-即课</p>
+            </div>
+            <time datetime="2018-11-26">2018-11-26</time>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      </ul>
+
+      <footer>
+        Built with <a href="https://revealjs.com">reveal.js</a>
+      </footer>
+    </main>
+  </body>
+</html>
