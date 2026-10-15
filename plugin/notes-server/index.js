@@ -38,6 +38,9 @@ io.on( 'connection', function( socket ) {
 	app.use( '/' + dir, staticDir( opts.baseDir + dir ) );
 });
 
+// Serve per-slide assets (e.g. ./images/) from the slide's own folder
+app.use( staticDir( opts.slideDir ) );
+
 app.get('/', function( req, res ) {
 
 	res.writeHead( 200, { 'Content-Type': 'text/html' } );
