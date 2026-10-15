@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="从有序数组查找出发，一步步推导 B+ 树" />
+    <meta name="author" content="Soros Liu" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <title>B+ Tree</title>
+
+    <link rel="stylesheet" href="./css/reveal.min.css" />
+    <link rel="stylesheet" href="./css/theme/black.css" id="theme" />
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="./lib/css/zenburn.css" />
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.type = 'text/css'
+      link.href = window.location.search.match(/print-pdf/gi)
+        ? './css/print/pdf.css'
+        : './css/print/paper.css'
+      document.getElementsByTagName('head')[0].appendChild(link)
+    </script>
+
+    <style>
+      .reveal h1,
+      .reveal h2 {
+        text-transform: none;
+      }
+      .reveal h2 {
+        font-size: 1.4em;
+      }
+      .reveal .q {
+        font-size: 0.9em;
+        text-align: left;
+      }
+      .reveal .q .label {
+        color: #42affa;
+        font-weight: 600;
+      }
+      .reveal .note {
+        color: #aaa;
+        font-size: 0.75em;
+      }
+      .reveal ul,
+      .reveal ol {
+        font-size: 0.8em;
+      }
+      .reveal ul ul {
+        font-size: 1em;
+      }
+      /* Graphviz diagrams are black on white */
+      .reveal img.diagram {
+        background: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 12px;
+        max-height: 420px;
+      }
+      .reveal pre {
+        width: 100%;
+        font-size: 0.45em;
+      }
+      .reveal pre code {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h1>B+ Tree</h1>
+          <p class="note">2021-09-06</p>
+        </section>
+
+        <!-- Q1 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q1:</span> 给定 <strong>有限个</strong>,
+              <strong>极少量</strong> 的 <strong>已排序</strong> 数组，查找某个值
+            </p>
+            <img class="diagram" src="./images/q1.svg" alt="已排序数组" />
+          </section>
+          <section>
+            <h2>Thought 1</h2>
+            <p>naive search, <code>O(n)</code> 时间复杂度</p>
+          </section>
+        </section>
+
+        <!-- Q2 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q2:</span> 给定 <strong>有限个</strong>,
+              <strong>少量</strong> 的 <strong>已排序</strong> 数组，查找某个值
+            </p>
+            <img class="diagram" src="./images/q2.svg" alt="已排序数组" />
+          </section>
+          <section>
+            <h2>Thought 2</h2>
+            <p>binary search, <code>O(log(n))</code> 时间复杂度</p>
+          </section>
+        </section>
+
+        <!-- Q3 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q3:</span> 加个限制：可用的堆内存 8KB。<br />
+              运行环境：disk page size: 4KB，int size: 32bit, 4B
+            </p>
+            <p class="q">
+              当Q2的数组长度达到 4096 个 (即数组 size: 4B × 4 × 1024 = 16KB)
+              时，怎么查找某个值
+            </p>
+            <p class="q note">此时：内存大小不足以完全放下所有数据了</p>
+            <img class="diagram" src="./images/q3.svg" alt="分布在多个 disk page 上的数组" />
+          </section>
+          <section>
+            <h2>Thought 3</h2>
+            <p>空间换时间 → binary search tree</p>
+            <img class="diagram" src="./images/q3-bst.svg" alt="二叉搜索树" />
+          </section>
+        </section>
+
+        <!-- Q4 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q4:</span> 当Q3的数组长度达到
+              <code>10,000,000,000</code>
+              时，以二叉搜索树作为搜索的数据结构，会遇到什么问题？
+            </p>
+            <p class="q note">
+              此时：数据会分布在约 <code>10,000,000</code> 个 disk page 上
+            </p>
+          </section>
+          <section>
+            <h2>Thought 4</h2>
+            <ol>
+              <li>
+                在二叉树上搜索的路径会很长：log<sub>2</sub>(10,000,000) ≈ 24
+              </li>
+              <li>
+                每个二叉树节点的 size: 4B (int) + 8B × 2 (2个 pointer) = 20B →
+                每个 disk page 可存大约 4096 / 20 ≈ 204 个节点
+              </li>
+              <li>1 和 2 结合起来，会在搜索二叉树时多次 read disk</li>
+              <li>读盘时间 &gt;&gt;&gt; 读内存时间，两者速度差的量级大约在 10<sup>3</sup> 级</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- Q5 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q5:</span> 如何优化二叉树在上述问题中的缺点？
+            </p>
+          </section>
+          <section>
+            <h2>Thought 5</h2>
+            <p>高瘦型树结构: binary tree (查找深度：log<sub>2</sub>N)</p>
+            <p>矮胖型树结构: B tree / B+ tree (查找深度：log<sub>n</sub>N)</p>
+          </section>
+          <section>
+            <h2>B+ 树节点结构</h2>
+            <p class="note">Key有序，每个Key伴随一个Pointer，指向下一级树节点</p>
+            <img class="diagram" src="./images/q5-node.png" alt="B+ 树节点结构" />
+          </section>
+          <section>
+            <h2>举个例子：n=5</h2>
+            <p class="note">🟥：内部节点，🟩：叶子节点</p>
+            <img class="diagram" src="./images/q5-example.svg" alt="n=5 的 B+ 树" />
+            <p class="note">内部节点 → 内部节点 / 叶子节点，叶子节点 → 磁盘页地址</p>
+          </section>
+          <section>
+            <h2>B+树的特征</h2>
+            <ul>
+              <li>除根节点外，每个节点至少 <strong>半满</strong> (避免退化成高瘦型树结构）</li>
+              <li>节点间保持有序 （类似二叉搜索树的要求）（搜索树的基本特征）</li>
+              <li>所有叶子节点在同一深度 （高度平衡树）</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- Q6 -->
+        <section>
+          <section>
+            <p class="q"><span class="label">Q6:</span> B+ tree 插入操作</p>
+          </section>
+          <section>
+            <h2>Demo</h2>
+            <p>插入新数据后，若节点全满：分裂</p>
+          </section>
+        </section>
+
+        <!-- Q7 -->
+        <section>
+          <section>
+            <p class="q"><span class="label">Q7:</span> B+ tree 删除操作</p>
+          </section>
+          <section>
+            <h2>Demo</h2>
+            <p>删除数据后，若节点少于半满</p>
+            <ul>
+              <li>重分配 （该节点与 sibling 节点的数据总数 ≥ n)</li>
+              <li>合并 (否则）</li>
+            </ul>
+            <p class="note">（注意观察 page #)</p>
+          </section>
+        </section>
+
+        <!-- Q8 -->
+        <section>
+          <section>
+            <p class="q"><span class="label">Q8:</span> B+ tree 搜索操作（查询）</p>
+          </section>
+          <section>
+            <h2>Thought 8</h2>
+            <p>与二叉搜索树相同的思想<br />同时，节点内二分搜索</p>
+          </section>
+        </section>
+
+        <!-- Q9 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q9:</span> B+ tree 如何做范围查询 (e.g. id &gt; 10
+              / id ≤ 100)
+            </p>
+          </section>
+          <section>
+            <h2>Thought 9</h2>
+            <p>叶子节点间的双向指针</p>
+          </section>
+        </section>
+
+        <!-- Q10 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q10:</span> 在删除节点导致「重分配」或「合并」时，如何查找
+              sibling 节点？
+            </p>
+          </section>
+          <section>
+            <h2>Thought 10</h2>
+            <ol>
+              <li>
+                在自上而下的查找路径中记录路径节点的 index，则该层 sibling 节点位于
+                index-1 或 index+1 的位置
+              </li>
+              <li>类似Q9的思想，同层内部节点间的双向指针</li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- Q11 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q11:</span> 上面讨论的假设都是 unique index key，如果要建立
+              index 的字段取值可重复，如 <code>user.birthday</code>，要怎么小小地修改一下 B+
+              tree ?
+            </p>
+            <p class="q note">
+              如：2000-01-01 生日的用户有 1000 个: user1, user2, user3, ... user1000
+            </p>
+          </section>
+          <section>
+            <h2>Thought 11</h2>
+            <ol>
+              <li>
+                对B+树节点结构不做修改<br />丧失了搜索树的优点<br />
+                <img
+                  class="diagram"
+                  src="./images/q11-duplicate-keys.svg"
+                  alt="重复 key 的叶子节点"
+                />
+              </li>
+              <li>
+                <code>birthday: 2000-01-01</code> 的叶子节点上指向一个 linked list:
+                <code>user1 -&gt; user2 -&gt; user3 -&gt; ... -&gt; user1000 -&gt; null</code>
+              </li>
+              <li>
+                让每条记录都能 unique, <code>(birthday, id)</code><br />
+                查找 <code>SELECT * FROM user WHERE birthday = 2000-01-01</code>
+                时，转换为范围查询
+                <code>[(2000-01-01, ID_MIN), (2000-01-01, ID_MAX)]</code>
+              </li>
+            </ol>
+          </section>
+        </section>
+
+        <!-- Q12 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q12:</span> 怎么支持多线程同时并发查询一棵 B+ tree ?
+            </p>
+          </section>
+          <section>
+            <h2>Thought 12</h2>
+            <ul>
+              <li>每个查询都排它锁根节点</li>
+              <li>
+                Crab 🦀 protocol （想象螃蟹走路）
+                <ul>
+                  <li>
+                    读：根节点共享锁 → 沿着查找路径向下走，对每个途径的节点都加共享锁 →
+                    落地下一级节点后，释放刚刚所在节点的锁
+                  </li>
+                  <li>
+                    写：根节点排它锁 → 沿着查找路径向下走，对每个途径的节点加排它锁 →
+                    落地下一级节点后，如果该节点 <strong>安全</strong>,
+                    则释放刚刚所在节点的锁<br />
+                    怎样算安全：
+                    <ul>
+                      <li>插入：该节点插入新数据后不会全满，即该节点不会出现分裂</li>
+                      <li>删除：该节点删除数据后不会半满，即该节点不会出现合并或重分配</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- Q13 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q13:</span> 在查找，插入，删除操作都是
+              <strong>随机</strong> 的情况下，怎么优化Q12的 Crab protocol ?
+            </p>
+          </section>
+          <section>
+            <h2>Thought 13</h2>
+            <p>
+              写操作时，在路径上从上到下查找时，都用共享锁，只在实际发生写的节点上用排它锁
+            </p>
+            <p>
+              如果查找过程中发现节点 不安全 , 则从根节点重试，用排它锁，即 fallback
+              到原先的 crab protocol 写操作
+            </p>
+            <p class="note">原因：当n很大时，发生分裂或合并、重分配的概率是很小的</p>
+          </section>
+        </section>
+
+        <!-- Q14 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q14:</span>
+              在对一棵B+树有高频的读写操作时，怎样在操作系统层面及计算机体系结构层面做优化？
+            </p>
+          </section>
+          <section>
+            <h2>Thought 14</h2>
+            <p>
+              操作系统层面：对根节点（及第一级节点，可选）做内存缓存，并标记常驻内存，使得不会被LRU换页策略驱逐出内存
+            </p>
+            <p>
+              体系结构层面：在存储层级上，将根节点放到更靠近CPU的地方，如CPU的L3，乃至L2缓存中
+            </p>
+          </section>
+        </section>
+
+        <!-- Q15 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q15:</span> 实际使用时，n会比较大，比方说 n=256。n
+              的取值怎么决定，是不是越大越好，有没有什么限制？
+            </p>
+          </section>
+          <section>
+            <h2>Thought 15</h2>
+            <ul>
+              <li>n大的 pros：B+tree更矮胖，log<sub>n</sub>N 更小，查找路径更短</li>
+              <li>
+                n大的 cons：节点通常不是全满的，n设置的太大会导致空间浪费 /
+                太大了也会花费更多的读盘、写盘时间 / 花更多时间做节点内搜索
+              </li>
+              <li>同时有限制：磁盘页大小，内存页大小，L3, L2缓存大小</li>
+            </ul>
+            <p class="note">
+              <a
+                href="https://source.wiredtiger.com/mongodb-4.2/tune_page_size_and_comp.html#configurable_page_struct"
+                >WiredTiger: Tuning page size and compression</a
+              >
+            </p>
+          </section>
+          <section>
+            <h2>举个例子</h2>
+            <pre><code class="shell" data-trim>
+&gt; db.podcasts.stats()
+"maximum internal page size" : 4096,
+"maximum leaf page size" : 32768,
+            </code></pre>
+          </section>
+        </section>
+
+        <!-- Q16 -->
+        <section>
+          <section>
+            <p class="q">
+              <span class="label">Q16:</span>
+              如何节省一次叶子节点到实际读盘的IO开销，只用索引完成查询？
+            </p>
+          </section>
+          <section>
+            <h2>Thought 16</h2>
+            <p class="note">
+              <a href="https://docs.mongodb.com/manual/core/query-optimization/#covered-query"
+                >Query Optimization</a
+              >
+            </p>
+            <pre><code class="shell" data-trim>
+&gt; db.episodes.find({ pid: 'pid1', status: 'NORMAL'}, { pid: 1, pubDate: 1, _id: 0}).explain()
+"winningPlan" : {
+      "stage" : "PROJECTION_COVERED",
+      ...
+}
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <h2>手写 B+ Tree</h2>
+          <ul>
+            <li>
+              <a href="https://15445.courses.cs.cmu.edu/fall2020/project2/"
+                >Project #2 - B+Tree - CMU 15-445/645 :: Intro to Database Systems (Fall
+                2020)</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/Sorosliu1029/Database-Systems/blob/master/Database-System-Concepts-7th-Edition.pdf"
+                >Database-System-Concepts-7th-Edition.pdf</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/Sorosliu1029/Database-Systems/blob/master/src/storage/index/b_plus_tree.cpp"
+                >Database-Systems/b_plus_tree.cpp at master · Sorosliu1029/Database-Systems</a
+              >
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <script src="./lib/js/head.min.js"></script>
+    <script src="./js/reveal.min.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        hideAddressBar: true,
+        slideNumber: 'h/v',
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          {
+            src: './lib/js/classList.js',
+            condition: function() {
+              return !document.body.classList
+            },
+          },
+          {
+            src: './plugin/highlight/highlight.js',
+            async: true,
+            callback: function() {
+              hljs.initHighlightingOnLoad()
+            },
+          },
+          { src: './plugin/search/search.js', async: true },
+          { src: './plugin/zoom-js/zoom.js', async: true },
+          { src: './plugin/notes/notes.js', async: true },
+        ],
+      })
+    </script>
+  </body>
+</html>
